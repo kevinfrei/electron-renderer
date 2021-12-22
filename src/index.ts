@@ -49,7 +49,13 @@ declare let window: MyWindow;
 // If I change that around, then I can switch contextIsolation in window.ts
 // to false
 let init = false;
-export function InitRender() {
+
+/**
+ * This is the magic that makes everything else in the elect-render-utils
+ * work properly. It must be invoked from inside the renderer.js file that
+ * lives in the static side of the codebase!
+ */
+export function InitRender(): void {
   if (init) return;
   init = true;
   window.addEventListener('DOMContentLoaded', () => {
