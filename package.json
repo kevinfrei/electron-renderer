@@ -1,6 +1,6 @@
 {
   "name": "@freik/electron-renderer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Kevin Frei's Electron Renderer utilit",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -36,7 +36,7 @@
     "@freik/core-utils": "^1.0.0",
     "@freik/elect-main-utils": "^0.2.0",
     "@freik/elect-render-utils": "^0.2.0",
-    "@freik/web-utils": "^0.1.0"
+    "@freik/web-utils": "^0.2.0"
   },
   "devDependencies": {
     "@freik/build-tools": "^3.2.1",
