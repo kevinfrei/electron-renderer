@@ -5,6 +5,7 @@ import { MakeError } from '@freik/core-utils';
 import { clipboard, IpcRenderer, ipcRenderer } from 'electron';
 import { ObjectEncodingOptions, OpenMode, PathLike, promises as fsp } from 'fs';
 import { FileHandle } from 'fs/promises';
+import * as process from 'node:process';
 
 const err = MakeError('freik-renderer-err');
 
@@ -30,6 +31,7 @@ type FreikConnector = {
   ipc: IpcRenderer;
   clipboard: Electron.Clipboard;
   readFile: ReadFile1 | ReadFile2 | ReadFile3;
+  hostOs: string;
 };
 
 interface MyWindow extends Window {
@@ -63,6 +65,7 @@ export function InitRender(): void {
       ipc: ipcRenderer,
       clipboard,
       readFile: fsp.readFile,
+      hostOs: process.platform,
     };
     window.freik = freik;
     if (window.initApp) {
