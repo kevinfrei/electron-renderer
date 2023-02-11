@@ -2,44 +2,17 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 import { MakeError } from '@freik/core-utils';
-import { clipboard, IpcRenderer, ipcRenderer } from 'electron';
-import { ObjectEncodingOptions, OpenMode, PathLike, promises as fsp } from 'fs';
-import { FileHandle } from 'fs/promises';
-import * as process from 'node:process';
+import { ElectronWindow } from '@freik/elect-render-utils';
+import { clipboard, ipcRenderer } from 'electron';
 
 const err = MakeError('freik-renderer-err');
 
-type ReadFile1 = (
-  path: PathLike | FileHandle,
-  options?: { encoding?: null; flag?: OpenMode } | null,
-) => Promise<Buffer>;
+// This needs to stay in sync with the @freik/elect-render-utils type
+// The presence of the Electron.Clipboard item is a little problematic
+// when thinking about moving it into my web-utils thing. Maybe I export
+// it from the render-utils and pull it in here...
 
-type ReadFile2 = (
-  path: PathLike | FileHandle,
-  options: { encoding: BufferEncoding; flag?: OpenMode } | BufferEncoding,
-) => Promise<string>;
-
-type ReadFile3 = (
-  path: PathLike | FileHandle,
-  options?:
-    | (ObjectEncodingOptions & { flag?: OpenMode })
-    | BufferEncoding
-    | null,
-) => Promise<string | Buffer>;
-
-type FreikConnector = {
-  ipc: IpcRenderer;
-  clipboard: Electron.Clipboard;
-  readFile: ReadFile1 | ReadFile2 | ReadFile3;
-  hostOs: string;
-};
-
-interface MyWindow extends Window {
-  freik?: FreikConnector;
-  initApp?: () => void;
-}
-
-declare let window: MyWindow;
+declare let window: ElectronWindow;
 
 // This will expose the ipcRenderer interface for use by the
 // React components, then, assuming the index.js has already be invoked, it
@@ -52,6 +25,20 @@ declare let window: MyWindow;
 // to false
 let init = false;
 
+function getHostOs(): 'mac' | 'win' | 'lin' | 'unk' {
+  const ua = navigator.userAgent;
+  if (ua.indexOf('Macintosh') >= 0) {
+    return 'mac';
+  }
+  if (ua.indexOf('Windows') >= 0) {
+    return 'win';
+  }
+  if (ua.indexOf('Linux') >= 0) {
+    return 'lin';
+  }
+  return 'unk';
+}
+
 /**
  * This is the magic that makes everything else in the elect-render-utils
  * work properly. It must be invoked from inside the renderer.js file that
@@ -61,13 +48,11 @@ export function InitRender(): void {
   if (init) return;
   init = true;
   window.addEventListener('DOMContentLoaded', () => {
-    const freik: FreikConnector = {
+    window.electronConnector = {
       ipc: ipcRenderer,
       clipboard,
-      readFile: fsp.readFile,
-      hostOs: process.platform,
+      hostOs: getHostOs(),
     };
-    window.freik = freik;
     if (window.initApp) {
       window.initApp();
     } else {
