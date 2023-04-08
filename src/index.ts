@@ -1,11 +1,11 @@
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
-import { MakeError } from '@freik/core-utils';
 import { ElectronWindow } from '@freik/elect-render-utils';
+import debug from 'debug';
 import { clipboard, ipcRenderer } from 'electron';
 
-const err = MakeError('freik-renderer-err');
+const err = debug('electron-renderer:error');
 
 // This needs to stay in sync with the @freik/elect-render-utils type
 // The presence of the Electron.Clipboard item is a little problematic
