@@ -5,7 +5,8 @@ import { ElectronWindow } from '@freik/elect-render-utils';
 import debug from 'debug';
 import { clipboard, ipcRenderer } from 'electron';
 
-const err = debug('electron-renderer:error');
+const err = debug('@freik/electron-renderer:error');
+err.enabled = true;
 
 // This needs to stay in sync with the @freik/elect-render-utils type
 // The presence of the Electron.Clipboard item is a little problematic
@@ -20,7 +21,7 @@ declare let window: ElectronWindow;
 // to the ipcRenderer to enable asynchronous callbacks to affect the Undux store
 
 // Yeah, this is unsafe
-// Should eventually is contextBridge.exposeInMainWorld
+// Should eventually use contextBridge.exposeInMainWorld
 // If I change that around, then I can switch contextIsolation in window.ts
 // to false
 let init = false;
@@ -45,7 +46,9 @@ function getHostOs(): 'mac' | 'win' | 'lin' | 'unk' {
  * lives in the static side of the codebase!
  */
 export function InitRender(): void {
-  if (init) return;
+  if (init) {
+    return;
+  }
   init = true;
   window.addEventListener('DOMContentLoaded', () => {
     window.electronConnector = {
